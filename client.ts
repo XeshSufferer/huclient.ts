@@ -1,5 +1,5 @@
 type WebSocketMessageHandler = (conn: WebSocket, message: Message) => void;
-type ConnectionCallback = (client: Client) => void;
+type ConnectionCallback = (client: Huclient) => void;
 
 interface MessageData {
     method: string;
@@ -16,7 +16,7 @@ export class Message {
     }
 }
 
-export class Client {
+export class Huclient {
     host: string;
     path: string;
     conn: WebSocket | null;
@@ -25,7 +25,7 @@ export class Client {
     onDisconnected: ConnectionCallback | null;
     reconnectAttempts: number;
     maxReconnectAttempts: number;
-    connectPromise: Promise<Client> | null;
+    connectPromise: Promise<Huclient> | null;
 
     constructor(host: string, path: string) {
         this.host = host;
@@ -49,7 +49,7 @@ export class Client {
         return this;
     }
 
-    connect(): Promise<Client> {
+    connect(): Promise<Huclient> {
         if (this.connectPromise) {
             return this.connectPromise;
         }
@@ -57,7 +57,7 @@ export class Client {
         const protocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         const connUrl = `${protocol}//${this.host}${this.path}`;
         
-        this.connectPromise = new Promise<Client>((resolve, reject) => {
+        this.connectPromise = new Promise<Huclient>((resolve, reject) => {
             try {
                 this.conn = new WebSocket(connUrl);
 
@@ -218,7 +218,7 @@ export class Client {
         return this.conn !== null && this.conn.readyState === WebSocket.OPEN;
     }
 
-    ready(): Promise<Client> {
+    ready(): Promise<Huclient> {
         if (this.isConnected()) {
             return Promise.resolve(this);
         }
@@ -270,4 +270,4 @@ export class Client {
     }
 }
 
-export default Client;
+export default Huclient;
